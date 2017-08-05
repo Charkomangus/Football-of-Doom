@@ -6,11 +6,11 @@
 struct ObjectPacket
 {
 	std::string id;
-	float x, y;
+	float x, y, rotation;
 };
 
 Networking::Networking(): hasBeenSet(false)
-{	
+{
 	ip = sf::IpAddress::getLocalAddress();
 	player1 = dynamic_cast<Player*>(GameManager::GetGameObjectManager().Get("Player1"));
 	player2 = dynamic_cast<Player*>(GameManager::GetGameObjectManager().Get("Player2"));
@@ -52,6 +52,8 @@ void Networking::SetAsServer()
 		
 }
 
+
+
 void Networking::SetAsClient()
 {
 	if (hasBeenSet) return;
@@ -74,32 +76,52 @@ void Networking::SetAsClient()
 }
 
 
-//Set the previous position of the player
-void Networking::UpdatePreviousPosition()
-{
-	if (player1 == nullptr)
-	{
-		player1 = dynamic_cast<Player*>(GameManager::GetGameObjectManager().Get("Player1"));
-		std::cout << "player was null" << std::endl;
-	}
-	prevPosition = player1->GetPosition();
-}
-
 
 
 void Networking::UpdatePosition(std::string id, SpriteObject* object)
 {
 	ObjectPacket objectPacket;
 	sf::Packet packet;
-	int x = object->GetPosition().x;
-	int y = object->GetPosition().y;
 	objectPacket.id = id;
-	objectPacket.x = x;
-	objectPacket.y = y;
+	objectPacket.x = object->GetPosition().x;
+	objectPacket.y = object->GetPosition().y;
+	objectPacket.rotation = object->GetSprite().getRotation();
 
-	packet << objectPacket.id << objectPacket.x << objectPacket.y;
-	socket.send(packet);	
-	packet.clear();
+	
+	if (id == "Player1")
+	{
+		if (objectPacket.x != player1PreviousPosition.x || objectPacket.y != player1PreviousPosition.y)
+		{
+			std::cout << " SENT PACKET: " << objectPacket.id << " " << object->GetPreviousPosition().x << " and " << objectPacket.x << std::endl;
+			packet << objectPacket.id << objectPacket.x << objectPacket.y << objectPacket.rotation;
+			socket.send(packet);
+			packet.clear();
+			player1PreviousPosition = object->GetPosition();
+		}	
+	}
+	else if (id == "Player2")
+	{
+		if (objectPacket.x != player2PreviousPosition.x || objectPacket.y != player2PreviousPosition.y)
+		{
+			std::cout << " SENT PACKET: " << objectPacket.id << " " << object->GetPreviousPosition().x << " and " << objectPacket.x << std::endl;
+			packet << objectPacket.id << objectPacket.x << objectPacket.y << objectPacket.rotation;
+			socket.send(packet);
+			packet.clear();
+			player2PreviousPosition = object->GetPosition();
+		}
+	}
+	else if (id == "Ball")
+	{
+		if (objectPacket.x != ballPreviousPosition.x || objectPacket.y != ballPreviousPosition.y)
+		{
+			std::cout << " SENT PACKET: " << objectPacket.id << " " << object->GetPreviousPosition().x << " and " << objectPacket.x << std::endl;
+			packet << objectPacket.id << objectPacket.x << objectPacket.y << objectPacket.rotation;
+			socket.send(packet);
+			packet.clear();
+			ballPreviousPosition = object->GetPosition();
+		}
+	}	
+	
 }
 
 void Networking::ReceivePosition(std::string id, SpriteObject* object)
@@ -108,30 +130,18 @@ void Networking::ReceivePosition(std::string id, SpriteObject* object)
 	sf::Packet packet;
 	socket.receive(packet);
 
-	if (packet >> objectPacket.id >> objectPacket.x >> objectPacket.y)
-	{
+	if (packet >> objectPacket.id >> objectPacket.x >> objectPacket.y >> objectPacket.rotation)
+	{				
 		if (id == objectPacket.id)
 		{
-			if (object->GetPosition().x != objectPacket.x || object->GetPosition().y != objectPacket.y)
+			if (object->GetPosition().x != objectPacket.x || object->GetPosition().y != objectPacket.y || objectPacket.rotation != object->GetSprite().getRotation())
 			{
 				object->SetPosition(objectPacket.x, objectPacket.y);
+				object->GetSprite().setRotation(objectPacket.rotation);
 				
 			}
 
 		}
 	}	
 }
-	
-	
-
-
-sf::Packet& operator <<(sf::Packet& packet, const ObjectPacket& p)
-{
-	return packet << p.id << p.x << p.y;
-}
-sf::Packet& operator >> (sf::Packet& packet, ObjectPacket& p)
-{
-	return packet >> p.id >> p.x >> p.y;
-}
-
 

@@ -12,10 +12,12 @@ public:
 	virtual sf::Vector2f GetPosition() const;
 	virtual float GetWidth() const;
 	virtual float GetHeight() const;
+	virtual sf::Vector2f GetPreviousPosition() const;
+	virtual void SetPreviousPosition(sf::Vector2f newPosition);
 	virtual sf::Rect<float> GetBoundingRect() const;
-
-protected:
 	sf::Sprite& GetSprite();
+protected:
+	
 	
 private:
 	sf::Sprite  _sprite;

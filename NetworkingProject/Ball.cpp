@@ -5,7 +5,7 @@
 Ball::Ball() :
 	_velocity(0),
 	_elapsedTimeSinceStart(0.0f),
-	_maxVelocity(500)
+	_maxVelocity(800)
 {
 	SpriteObject::Load("images/ball.png");
 	assert(IsLoaded());
@@ -68,10 +68,10 @@ void Ball::Update(float elapsedTime) //Parameter is the time since last frame in
 	else if(_velocity < -_maxVelocity)
 		_velocity = -_maxVelocity;
 
-	//if (_velocity > 0)
-	//	_velocity -= 0.05;
-	//if (_velocity < 0)
-	//	_velocity += 0.05;
+	if (_velocity > 0)
+		_velocity -= 0.05;
+	if (_velocity < 0)
+		_velocity += 0.05;
 
 
 }
@@ -95,7 +95,7 @@ void Ball::Kicked(Player* player)
 	_angle *= 60;
 
 
-	_velocity += 5;
+	_velocity += 10;
 }
 
 

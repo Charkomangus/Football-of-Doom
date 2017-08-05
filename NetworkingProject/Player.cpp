@@ -6,9 +6,9 @@
 #include "Ball.h"
 
 
-Player::Player() :	_velocity(0,0), _maxVelocity(500), playerNumber(1)
+Player::Player() :	_velocity(0,0), _maxVelocity(600), playerNumber(1), speed(10)
 {
-	SpriteObject::Load("images/paddle.png");
+	SpriteObject::Load("images/Player1.png");
 	assert(IsLoaded());
 
 	GetSprite().setOrigin(GetSprite().getLocalBounds().width / 2, GetSprite().getLocalBounds().height / 2);
@@ -27,6 +27,10 @@ void Player::Draw(sf::RenderWindow & rw)
 
 void Player::SetPlayerNumber(int number)
 {
+	if(number == 1)
+		SpriteObject::Load("images/Player1.png");
+	else 
+		SpriteObject::Load("images/Player2.png");
 	playerNumber = number;
 }
 
@@ -36,60 +40,158 @@ sf::Vector2<float> Player::GetVelocity() const
 }
 
 void Player::Update(float elapsedTime)
-{	
-	if (playerNumber != 1) return;		
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+{
+	
+	//Collision
+	if (playerNumber == 1) 
+	{
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
 		{
-			_velocity.y -= 0.5f;
+			_velocity.y -= speed;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 		{
-			_velocity.y += 0.5f;
+			_velocity.y += speed;
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 		{
-			_velocity.x -= 0.5f;
+			_velocity.x -= speed;
 		}
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 		{
-			_velocity.x += 0.5f;
+			_velocity.x += speed;
 		}
 		_velocity.x = std::min(_maxVelocity, std::max(_velocity.x, -_maxVelocity));
 		_velocity.y = std::min(_maxVelocity, std::max(_velocity.y, -_maxVelocity));
 
-		
+
+
+
 		if (_velocity.x > 0)
-			_velocity.x -= 0.3;
+			_velocity.x -= 1;
 		if (_velocity.x < 0)
-			_velocity.x += 0.3;
+			_velocity.x += 1;
 
 		if (_velocity.y < 0)
-			_velocity.y+= 0.3;
+			_velocity.y += 1;
 		if (_velocity.y > 0)
-			_velocity.y-= 0.3;
+			_velocity.y -= 1;
+
+
+
+		sf::Vector2f pos = this->GetPosition();
+
+		if (pos.x  < GetSprite().getLocalBounds().width / 2)
+		{
+			SetPosition(GetSprite().getLocalBounds().width / 2, GetPosition().y);
+			_velocity.x = -_velocity.x / 2;// Bounce by current velocity in opposite direction
+		}
+		if (pos.x >GameManager::SCREEN_WIDTH - GetSprite().getLocalBounds().width / 2)
+		{
+			SetPosition(GameManager::SCREEN_WIDTH - GetSprite().getLocalBounds().width / 2, GetPosition().y);
+			_velocity.x = -_velocity.x / 2;// Bounce by current velocity in opposite direction
+		}
+		if (pos.y  < GetSprite().getLocalBounds().height / 2)
+		{
+			SetPosition(GetPosition().x, GetSprite().getLocalBounds().height / 2);
+			_velocity.y = -_velocity.y / 2; // Bounce by current velocity in opposite direction
+		}
+		if (pos.y >GameManager::SCREEN_HEIGHT - GetSprite().getLocalBounds().height / 2)
+		{
+			SetPosition(GetPosition().x, GameManager::SCREEN_HEIGHT - GetSprite().getLocalBounds().height / 2);
+			_velocity.y = -_velocity.y / 2; // Bounce by current velocity in opposite direction
+		}
+
+		sf::Rect<float> p1BB = dynamic_cast<Player*>(GameManager::GetGameObjectManager().Get("Player2"))->GetBoundingRect();
+
+		if (p1BB.intersects(GetBoundingRect()))
+		{
+			_velocity.x = -_velocity.x / 2;
+			_velocity.y = -_velocity.y / 2;
+			SetPosition(GetPosition().x + _velocity.x/2, GetPosition().y + _velocity.y/2);
+		}
+
+		GetSprite().move(_velocity * elapsedTime);
 	
 	
 
-	sf::Vector2f pos = this->GetPosition();
-
-	if (pos.x  < GetSprite().getLocalBounds().width / 2	|| pos.x >(GameManager::SCREEN_WIDTH - GetSprite().getLocalBounds().width / 2))
-	{
-		_velocity.x = -_velocity.x; // Bounce by current velocity in opposite direction
 	}
-	if (pos.y  < GetSprite().getLocalBounds().height / 2 || pos.y >(GameManager::SCREEN_HEIGHT - GetSprite().getLocalBounds().height / 2))
+	else if(playerNumber == 2)
 	{
-		_velocity.y = -_velocity.y; // Bounce by current velocity in opposite direction
-	}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+		{
+			_velocity.y -= speed;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+		{
+			_velocity.y += speed;
+		}
 
-	GetSprite().move(_velocity * elapsedTime);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+		{
+			_velocity.x -= speed;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+		{
+			_velocity.x += speed;
+		}
+		_velocity.x = std::min(_maxVelocity, std::max(_velocity.x, -_maxVelocity));
+		_velocity.y = std::min(_maxVelocity, std::max(_velocity.y, -_maxVelocity));
 
-	
+		if (_velocity.x > 0)
+			_velocity.x -= 1;
+		if (_velocity.x < 0)
+			_velocity.x += 1;
+
+		if (_velocity.y < 0)
+			_velocity.y += 1;
+		if (_velocity.y > 0)
+			_velocity.y -= 1;
+
+
+		sf::Vector2f pos = this->GetPosition();
+
+		if (pos.x  < GetSprite().getLocalBounds().width / 2)
+		{
+			SetPosition(GetSprite().getLocalBounds().width / 2, GetPosition().y);
+			_velocity.x = -_velocity.x / 2;// Bounce by current velocity in opposite direction
+		}
+		if(pos.x >GameManager::SCREEN_WIDTH - GetSprite().getLocalBounds().width / 2)
+		{
+			SetPosition(GameManager::SCREEN_WIDTH - GetSprite().getLocalBounds().width / 2, GetPosition().y);
+			_velocity.x = -_velocity.x / 2;// Bounce by current velocity in opposite direction
+		}
+		if (pos.y  < GetSprite().getLocalBounds().height / 2)
+		{
+			SetPosition(GetPosition().x, GetSprite().getLocalBounds().height / 2);
+			_velocity.y = -_velocity.y / 2; // Bounce by current velocity in opposite direction
+		}
+		if(pos.y >GameManager::SCREEN_HEIGHT - GetSprite().getLocalBounds().height / 2)
+		{
+			SetPosition(GetPosition().x, GameManager::SCREEN_HEIGHT - GetSprite().getLocalBounds().height / 2);
+			_velocity.y = -_velocity.y / 2; // Bounce by current velocity in opposite direction
+		}
+				
+		sf::Rect<float> p1BB = dynamic_cast<Player*>(GameManager::GetGameObjectManager().Get("Player1"))->GetBoundingRect();
+
+		if (p1BB.intersects(GetBoundingRect()))
+		{
+			_velocity.x = -_velocity.x/2;
+			_velocity.y = -_velocity.y/2;
+			SetPosition(GetPosition().x + _velocity.x / 2, GetPosition().y + _velocity.y / 2);
+		}
+		GetSprite().move(_velocity * elapsedTime);
+
+
+	}	
 	UpdateRotation();
 	
 	
 
 }
+
+
 
 void Player::UpdateRotation()
 {	

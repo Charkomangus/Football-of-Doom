@@ -14,12 +14,12 @@ void GameManager::Start(void)
 		return;
 
 	_mainWindow.create(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 32), "Bonk's Football of Doom!");
-	
+	_mainWindow.setFramerateLimit(30);
 
 	//Setting Game background
 	BackGround *background = new BackGround();
 	
-
+	
 	Networking *_networking = new Networking();
 	
 	//Adding a player
@@ -28,7 +28,7 @@ void GameManager::Start(void)
 	player1->SetPlayerNumber(1);
 	Player *player2 = new Player();
 	player2->SetPosition(SCREEN_WIDTH - 100, SCREEN_HEIGHT / 2);
-	player2->SetPlayerNumber(2);
+	player2->SetPlayerNumber(3);
 	////Adding a ball
 	Ball *ball = new Ball();
 	ball->SetPosition((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 15);
@@ -39,10 +39,11 @@ void GameManager::Start(void)
 	_gameObjectManager.Add("Ball", ball);
 
 	_gameState = ShowingSplash;	
-
+	
 	while (!IsExiting())
 	{
-		GameLoop(_networking);
+			GameLoop(_networking);
+		
 	}
 
 	_mainWindow.close();
@@ -71,9 +72,6 @@ const sf::Event& GameManager::GetInput()
 
 void GameManager::GameLoop(Networking* _networking)
 {
-	sf::Event currentEvent;
-	_mainWindow.pollEvent(currentEvent);
-
 	
 	switch (_gameState)
 	{
@@ -89,55 +87,52 @@ void GameManager::GameLoop(Networking* _networking)
 			break;
 		}
 		case PlayingServer:		
-		{	
-			
-			_mainWindow.clear(sf::Color(0, 0, 0));			
-
-
-			_networking->SetAsServer();			
+		{
+			_mainWindow.clear(sf::Color(0, 0, 0));
+			_networking->SetAsServer();
 			_gameObjectManager.UpdateAll();
-					
-			SpriteObject* ball = _gameObjectManager.Get("Ball");
-			SpriteObject* player1 = _gameObjectManager.Get("Player1");
-			_networking->UpdatePosition("Player1", player1);
-			_networking->UpdatePosition("Ball", ball);
-			
-			_gameObjectManager.DrawAll(_mainWindow);		
+			_networking->ReceivePosition("Player2", _gameObjectManager.Get("Player2"));					
+			_networking->UpdatePosition("Player1", _gameObjectManager.Get("Player1"));
+			_networking->UpdatePosition("Ball", _gameObjectManager.Get("Ball"));			
+			_gameObjectManager.DrawAll(_mainWindow);
 			_mainWindow.display();
+			
+			sf::Event currentEvent;
+			_mainWindow.pollEvent(currentEvent);
+			_gameObjectManager.SetPreviousPositionAll();
 			if (currentEvent.type == sf::Event::Closed)
-				_gameState = Exiting;			
-
+				_gameState = Exiting;
 			if (currentEvent.type == sf::Event::KeyPressed)
 			{
 				if (currentEvent.key.code == sf::Keyboard::Escape) ShowMenu();
 			}
-		
 			break;
 		}
 		case PlayingClient:
 		{			
-			_mainWindow.clear(sf::Color(0, 0, 0));
+			Player* player2 = dynamic_cast<Player*>(GameManager::GetGameObjectManager().Get("Player2"));
+			_mainWindow.clear(sf::Color(0, 0, 0));			
+			_networking->SetAsClient();		
+			_networking->ReceivePosition("Player1", _gameObjectManager.Get("Player1"));			
+			_networking->ReceivePosition("Ball", _gameObjectManager.Get("Ball"));	
+			
 
-			_networking->SetAsClient();				
-			SpriteObject* ball = _gameObjectManager.Get("Ball");
-			Player* player1 = dynamic_cast<Player*>(GameManager::GetGameObjectManager().Get("Player1"));
-			_networking->ReceivePosition("Player1", player1);
-			_networking->ReceivePosition("Ball", ball);
-				
-			player1->UpdateRotation();
-
-
-
+			player2->SetPlayerNumber(2);
+			_gameObjectManager.UpdateObject("Player2");
+			_networking->UpdatePosition("Player2", player2);
+		
 			_gameObjectManager.DrawAll(_mainWindow);
 			_mainWindow.display();
+
+			sf::Event currentEvent;
+			_mainWindow.pollEvent(currentEvent);
 			if (currentEvent.type == sf::Event::Closed)
 				_gameState = Exiting;
-
 			if (currentEvent.type == sf::Event::KeyPressed)
 			{
 				if (currentEvent.key.code == sf::Keyboard::Escape) ShowMenu();
 			}
-
+				
 			break;
 		}
 	default: ;
@@ -171,6 +166,7 @@ void GameManager::ShowMenu()
 	default: ;
 	}
 }
+
 
 
 const GameObjectManager& GameManager::GetGameObjectManager()

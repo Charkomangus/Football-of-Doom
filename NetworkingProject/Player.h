@@ -8,6 +8,7 @@ public:
 	~Player();
 
 	void Update(float elapsedTime) override;
+	void NetworkedUpdate(float velocityX, float velocityY);
 	void UpdateRotation();
 	void Draw(sf::RenderWindow& rw) override;
 	void SetPlayerNumber(int number);
@@ -15,8 +16,9 @@ public:
 
 private:
 	sf::Vector2<float> _velocity;
-	float _maxVelocity;
+	float _maxVelocity, speed;
 	int playerNumber;
+	
 	
 };
 

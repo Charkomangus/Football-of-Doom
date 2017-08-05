@@ -14,7 +14,9 @@ public:
 
 	void DrawAll(sf::RenderWindow& renderWindow);
 	void UpdateAll();
-	void NetworkedUpdateAll();
+	void SetPreviousPosition(sf::String id);
+	void SetPreviousPositionAll();
+	void UpdateObject(sf::String id);
 private:
 	std::map<std::string, SpriteObject*> _gameObjects;
 	sf::Clock clock;

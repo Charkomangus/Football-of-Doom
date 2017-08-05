@@ -1,14 +1,12 @@
 #pragma once
 #include "Ball.h"
-class Player;
+
 
 class Networking 
 {
 public:	
 	Networking();
 	~Networking();
-	void UpdatePreviousPosition();
-	void SendPositionPacket(sf::Vector2f position, sf::Vector2f prevPosition);
 	void UpdatePosition(std::string id, SpriteObject* player);
 	void ReceivePosition(std::string id, SpriteObject* player);
 	void SetAsClient();
@@ -22,6 +20,8 @@ private:
 	Ball* ball;
 	sf::Vector2f prevPosition;
 	bool hasBeenSet;
+	sf::Vector2f player1PreviousPosition, player2PreviousPosition, ballPreviousPosition;
+
 	
 };
 

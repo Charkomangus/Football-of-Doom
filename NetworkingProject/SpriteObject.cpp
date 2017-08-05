@@ -80,11 +80,24 @@ float SpriteObject::GetHeight() const
 	return _sprite.getLocalBounds().height;
 }
 
+//Helper function - return objects position
+sf::Vector2f SpriteObject::GetPreviousPosition() const
+{
+	return GetPosition();
+}
+
+//Helper function - set objects position
+void SpriteObject::SetPreviousPosition(sf::Vector2f newPosition)
+{
+	SetPosition(newPosition.x, newPosition.y);
+}
+
 //Helper function - return objects width
 float SpriteObject::GetWidth() const
 {
 	return _sprite.getLocalBounds().width;
 }
+
 
 //Return a bounding rect 
 sf::Rect<float> SpriteObject::GetBoundingRect() const

@@ -55,10 +55,40 @@ void GameObjectManager::UpdateAll()
 	float timeDelta = clock.restart().asSeconds();
 
 	while (itr != _gameObjects.end())
-	{
+	{		
 		itr->second->Update(timeDelta);
+
 		++itr;
 	}
+}
+
+
+//Update all the objects
+void GameObjectManager::SetPreviousPositionAll()
+{
+	std::map<std::string, SpriteObject*>::const_iterator itr = _gameObjects.begin();
+
+	while (itr != _gameObjects.end())
+	{
+		itr->second->SetPreviousPosition(itr->second->GetSprite().getPosition());
+		++itr;
+	}
+}
+
+//Update all the objects
+void GameObjectManager::SetPreviousPosition(sf::String id)
+{
+	SpriteObject* object = Get(id);
+	float timeDelta = clock.restart().asSeconds();
+	object->SetPreviousPosition(object->GetPosition());
+}
+
+//Update a particular object
+void GameObjectManager::UpdateObject(sf::String id)
+{
+	SpriteObject* object = Get(id);
+	float timeDelta = clock.restart().asSeconds();
+	object->Update(timeDelta);
 }
 
 
