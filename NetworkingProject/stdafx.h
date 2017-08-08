@@ -22,3 +22,6 @@
 #include <iostream>
 #include <cassert>
 #include <list>
+#include <algorithm>
+#include <array>
+#include "GameManager.h"

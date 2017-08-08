@@ -51,6 +51,12 @@
     <ClInclude Include="Networking.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Goal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -84,6 +90,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Networking.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Goal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

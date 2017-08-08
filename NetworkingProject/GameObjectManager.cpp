@@ -1,4 +1,7 @@
-// GameObejectManager.cpp : Responsible for all game objects in the gameAh
+/*********************************************************************************
+* Manager/Pool for sprite objects - Keeps things neeter in game manager
+* Created by Charalampos Koundourakis <1603155@abertay.ac.uk>
+*********************************************************************************/
 
 #include "stdafx.h"
 #include "GameObjectManager.h"
@@ -32,6 +35,18 @@ void GameObjectManager::Remove(std::string name)
 	}
 }
 
+//Update all the objects
+void GameObjectManager::RemoveAll()
+{
+	std::map<std::string, SpriteObject*>::const_iterator itr = _gameObjects.begin();
+	while (itr != _gameObjects.end())
+	{
+		delete itr->second;	
+
+		++itr;
+	}
+}
+
 //Go through the map of game objects and return the result whose key matches the value given
 SpriteObject* GameObjectManager::Get(std::string name) const
 {
@@ -39,7 +54,6 @@ SpriteObject* GameObjectManager::Get(std::string name) const
 	if (results == _gameObjects.end())
 		return nullptr;
 	return results->second;
-
 }
 
 //Return the map size
@@ -62,27 +76,6 @@ void GameObjectManager::UpdateAll()
 	}
 }
 
-
-//Update all the objects
-void GameObjectManager::SetPreviousPositionAll()
-{
-	std::map<std::string, SpriteObject*>::const_iterator itr = _gameObjects.begin();
-
-	while (itr != _gameObjects.end())
-	{
-		itr->second->SetPreviousPosition(itr->second->GetSprite().getPosition());
-		++itr;
-	}
-}
-
-//Update all the objects
-void GameObjectManager::SetPreviousPosition(sf::String id)
-{
-	SpriteObject* object = Get(id);
-	float timeDelta = clock.restart().asSeconds();
-	object->SetPreviousPosition(object->GetPosition());
-}
-
 //Update a particular object
 void GameObjectManager::UpdateObject(sf::String id)
 {
@@ -90,7 +83,6 @@ void GameObjectManager::UpdateObject(sf::String id)
 	float timeDelta = clock.restart().asSeconds();
 	object->Update(timeDelta);
 }
-
 
 //Draw all the game objects
 void GameObjectManager::DrawAll(sf::RenderWindow& renderWindow)

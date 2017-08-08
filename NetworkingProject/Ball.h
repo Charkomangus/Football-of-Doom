@@ -1,6 +1,9 @@
+/*********************************************************************************
+* Ball class - Updates it's movement and oversees it's collisions
+* Created by Charalampos Koundourakis <1603155@abertay.ac.uk>
+*********************************************************************************/
 #pragma once
 #include "SpriteObject.h"
-
 
 class Player;
 
@@ -10,7 +13,7 @@ class Ball :
 public:
 	Ball();
 	virtual ~Ball();
-	void Update(float) override;
+	void Update(float) override;	
 
 private:
 	void Collision(Player* player);

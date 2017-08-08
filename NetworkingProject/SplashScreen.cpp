@@ -1,13 +1,16 @@
-//Intro screen for showcasing logo - will display an image until the player clicks away
+/*********************************************************************************
+* Intro screen for showcasing logo - will display an image until the player clicks away
+* Created by Charalampos Koundourakis <1603155@abertay.ac.uk>
+*********************************************************************************/
 
 #include "stdafx.h"
 #include "SplashScreen.h"
 
 //Display the image if it exists and listen for input
-void SplashScreen::Show(sf::RenderWindow & renderWindow)
+void SplashScreen::Show(sf::RenderWindow & renderWindow, std::string filename)
 {
 	sf::Texture image;
-	if (image.loadFromFile("images/SplashScreen.png") != true)
+	if (image.loadFromFile(filename) != true)
 	{
 		return;
 	}
